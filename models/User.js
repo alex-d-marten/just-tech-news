@@ -1,8 +1,14 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
+const bcrypt = require('bcrypt');
 
 // creat our User model
-class User extends Model {}
+class User extends Model {
+    // set up a method to run on instance data (per user) to check password
+    checkPassword(loginPw) {
+        return bcrypt.compareSync(loginPw, this.password)
+    }
+}
 
 // define table columns and configuration
 User.init(
@@ -44,18 +50,29 @@ User.init(
             }
         }
     },
-    // TABLE CONFIGURATION OPTIONS GO HERE
     {
-    // pass in our imported sequelize connection (the direct connection to our database)
-    sequelize,
-    // dont' automatically creat createdAt/updatedAt timestamp fields
-    timestamps: false,
-    // dont' pluralize name of database tables
-    freezeTableName: true,
-    // use underscores instead of camel-casing
-    underscored: true,
-    // make it so our model name stays lowercase in the database
-    modelName: 'user'
+        hooks: {
+            // set up beforeCreate lifecycle "hook" functionality
+            async beforeCreate(newUserData) {
+                newUserData.password = await bcrypt.hash(newUserData.password, 10)
+                return newUserData
+            },
+            // set up beforeUpdate lifecycle "hook" functionality
+            async beforeUpdate(updatedUserData) {
+                updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10)
+                return updatedUserData
+            }
+        },
+        // pass in our imported sequelize connection (the direct connection to our database)
+        sequelize,
+        // dont' automatically creat createdAt/updatedAt timestamp fields
+        timestamps: false,
+        // dont' pluralize name of database tables
+        freezeTableName: true,
+        // use underscores instead of camel-casing
+        underscored: true,
+        // make it so our model name stays lowercase in the database
+        modelName: 'user'
     }
 )
 
