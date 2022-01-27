@@ -22,10 +22,10 @@ class Post extends Model {
                         'vote_count'
                     ]
                 ]
-            })
-        })
-    }
-}
+            });
+        });
+    };
+};
 
 // create fields/columns for Post model
 Post.init(
@@ -61,6 +61,6 @@ Post.init(
         underscored: true,
         modelName: 'post'
     }
-)
+);
 
 module.exports = Post;

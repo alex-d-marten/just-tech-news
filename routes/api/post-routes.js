@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { Post, User, Vote } = require('../../models');
-const sequelize = require('../../config/connection')
+const { Post, User, Vote, Comment } = require('../../models');
+const sequelize = require('../../config/connection');
 
 // get all posts
 router.get('/', (req, res) => {
@@ -17,6 +17,14 @@ router.get('/', (req, res) => {
         order: [['created_at', 'DESC']],
         include: [
             {
+                model: Comment,
+                attributes: ['id','comment_text', 'post_id','user_id','created_at'],
+                include: {
+                    model: User,
+                    attributes: ['username']
+                }
+            },
+            {
                 model: User,
                 attributes: ['username']
             }
@@ -27,7 +35,7 @@ router.get('/', (req, res) => {
         console.log(err)
         res.status(500).json(err)
     })
-})
+});
 
 // get one post by id
 router.get('/:id', (req, res) => {
@@ -45,6 +53,14 @@ router.get('/:id', (req, res) => {
         ],
         include: [
             {
+                model: Comment,
+                attributes: ['id','comment_text', 'post_id','user_id','created_at'],
+                include: {
+                    model: User,
+                    attributes: ['username']
+                }
+            },
+            {
                 model: User,
                 attributes: ['username']
             }
@@ -61,7 +77,7 @@ router.get('/:id', (req, res) => {
         console.log(err)
         res.status(500).json(err)
     })
-})
+});
 
 // create a new post
 router.post('/', (req, res) => {
@@ -75,7 +91,7 @@ router.post('/', (req, res) => {
         console.log(err)
         res.status(500).json(err)
     })
-})
+});
 
 // PUT /api/posts/upvote
 // this must be before /api/posts/:id or else this route will be treated as a /:id
@@ -85,8 +101,8 @@ router.put('/upvote', (req, res) => {
         .catch(err => {
         console.log(err);
         res.status(400).json(err);
-        });
-    });  
+    });
+});  
 
 // update a Post's title
 router.put('/:id', (req, res) => {
@@ -111,7 +127,7 @@ router.put('/:id', (req, res) => {
         console.log(err)
         res.status(500).json(err)
     })
-})
+});
 
 // delete a post
 router.delete('/:id', (req, res) => {
@@ -131,6 +147,6 @@ router.delete('/:id', (req, res) => {
         console.log(err)
         res.status(500).json(err)
     })
-})
+});
 
 module.exports = router;
