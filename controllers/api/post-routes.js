@@ -14,7 +14,6 @@ router.get('/', (req, res) => {
             [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 
             'vote_count']
         ],
-        order: [['created_at', 'DESC']],
         include: [
             {
                 model: Comment,
@@ -30,7 +29,11 @@ router.get('/', (req, res) => {
             }
         ]
     })
-    .then(dbPostData => res.json(dbPostData))
+    .then(dbPostData => {
+        console.log(dbPostData[0])
+        const posts = dbPostData.map(post => post.get({ plain: true }));
+        res.render('homepage', { posts })
+    })
     .catch(err => {
         console.log(err)
         res.status(500).json(err)
